@@ -1,0 +1,27 @@
+generator client {
+  provider = "prisma-client-js"
+  output = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = "mysql://root:1234@localhost:3306/ikwydlnitus"
+}
+
+model Stock {
+  id    Int     @id @default(autoincrement())
+  name String  @unique
+  ticker  String  @unique
+  news News[]
+}
+
+model News {
+  id    Int     @id @default(autoincrement())
+  date DateTime 
+  summary  String
+  stock Stock  @relation(fields: [stockId], references: [id])
+  stockId Int @map("stock_id")
+  createdAt  DateTime   @default(now()) @map("created_at")
+  modifiedAt  DateTime   @updatedAt @map("modified_at")
+}
+
