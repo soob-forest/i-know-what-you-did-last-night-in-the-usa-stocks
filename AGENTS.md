@@ -5,6 +5,7 @@ Problem definition → small, safe change → change review → refactor — rep
 
 - Before changing anything, read the relevant files end to end, including all call/reference paths.
 - Keep tasks, commits, and PRs small.
+- commit message는 한글로 작성
 - If you make assumptions, record them in the Issue/PR/ADR.
 - Never commit or log secrets; validate all inputs and encode/normalize outputs.
 - Avoid premature abstraction and use intention-revealing names.
@@ -40,6 +41,9 @@ Problem definition → small, safe change → change review → refactor — rep
 - Tests must be deterministic and independent; replace external systems with fakes/contract tests.
 - Include ≥1 happy path and ≥1 failure path in e2e tests.
 - Proactively assess risks from concurrency/locks/retries (duplication, deadlocks, etc.).
+- 테스트를 직접 실행하여 검증한다.
+- Java: JUnit 5 via Spring Boot Starter Test. Prefer slice tests for web/data; name tests after unit under test.
+- TypeScript: Jest. Unit tests in `src/**/**.spec.ts`; e2e in `test/**`. Aim for meaningful coverage (`pnpm test:cov`).
 
 ## Security Rules
 
@@ -91,23 +95,3 @@ Problem definition → small, safe change → change review → refactor — rep
   - Lint/Format: `pnpm lint` / `pnpm format`
   - Tests: `pnpm test`, `pnpm test:e2e`, `pnpm test:cov`
   - Prisma: `pnpm prisma generate` (after schema changes)
-
-## Coding Style & Naming
-- Java: 4-space indent, Lombok for boilerplate, Spring idioms (controllers/services/repos). Test classes `*Test.java` under `src/test/java`.
-- TypeScript: follow ESLint + Prettier (`.eslintrc.js`, `.prettierrc`).
-  - Files: `kebab-case.ts`; Classes/Providers: `PascalCase`; variables/functions: `camelCase`.
-  - Nest conventions: `*.module.ts`, `*.service.ts`, `*.controller.ts`.
-
-## Testing Guidelines
-- Java: JUnit 5 via Spring Boot Starter Test. Prefer slice tests for web/data; name tests after unit under test.
-- TypeScript: Jest. Unit tests in `src/**/**.spec.ts`; e2e in `test/**`. Aim for meaningful coverage (`pnpm test:cov`).
-
-## Commit & PR Guidelines
-- Commits: imperative present, concise scope, e.g. `feat(api): add subscription endpoint`.
-- PRs: include purpose, linked issues, how to run/test, and any config changes. Add screenshots/logs for observable behavior.
-- Ensure CI-local build passes: `./gradlew build` and `pnpm test`.
-
-## Security & Configuration
-- MySQL local defaults: `root:1234@localhost:3306/ikwydlnitus` (see `application.yml` and Prisma datasource). Override via env for non-local.
-- Slack: set `slack.bot-token`/`slack.secret` in `api/slack` config.
-- OpenAI: set `OPENAI_API_KEY` for `collector` (`src/libs/openai`). Store secrets in `.env` (not committed).
