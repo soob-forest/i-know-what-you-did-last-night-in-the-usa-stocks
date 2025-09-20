@@ -19,6 +19,8 @@ class NewsControllerTest {
 
   @Autowired MockMvc mockMvc;
   @MockBean NewsQueryService newsQueryService;
+  // Prevent JPA metamodel initialization in MVC slice
+  @MockBean org.springframework.data.jpa.mapping.JpaMetamodelMappingContext jpaMappingContext;
 
   @Test
   void getNews_returnsOkPayload() throws Exception {
@@ -31,4 +33,3 @@ class NewsControllerTest {
         .andExpect(jsonPath("$[0].links[0].title").value("T"));
   }
 }
-

@@ -13,8 +13,8 @@ public class SlackAppConfig {
 
   @Bean
   public App slackApp() {
-    AppConfig appConfig = AppConfig.builder().singleTeamBotToken(process.env['SLACK_BOT_TOKEN'] )
-        .signingSecret(process.env['SLACK_BOT_SECRET']).build();
+    AppConfig appConfig = AppConfig.builder().singleTeamBotToken(System.getenv("SLACK_BOT_TOKEN"))
+        .signingSecret(System.getenv("SLACK_BOT_SECRET")).build();
     App app = new App(appConfig);
     app.command("/hello", (req, ctx) -> ctx.ack("Hi there!"));
 
