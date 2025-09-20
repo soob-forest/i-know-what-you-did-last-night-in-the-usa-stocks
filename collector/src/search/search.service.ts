@@ -7,17 +7,22 @@ import { XMLParser } from 'fast-xml-parser';
 export class SearchService {
   private readonly parser = new XMLParser();
   constructor() {}
-  async search(stock: string): Promise<any> {
+  async search(stock: string): Promise<{ summary: string; links: { title: string; url: string; source?: string }[] }[]> {
     const response = wretch(
       `https://news.google.com/rss/search?q=intitle:${stock}+when:8h&hl=en-US&gl=US&ceid=US:en&sort=date`,
     ).get();
 
     const text = await response.text();
 
-    const news: { id: string; title: string; link: string }[] = this.parser
+    const news: { idx: number; title: string; link: string; source?: string }[] = this.parser
       .parse(text)
-      .rss.channel.item.map(({ guid, title, link }) => {
-        return { id: guid, title, link };
+      .rss.channel.item
+      .map(({ title, link }, index) => {
+        let source: string | undefined = undefined;
+        try {
+          source = new URL(link).hostname.replace(/^www\./, '');
+        } catch {}
+        return { idx: index, title, link, source };
       });
 
     const titles = news
@@ -76,11 +81,20 @@ export class SearchService {
 
     console.log(summaryResult.choices[0].message.content);
 
-    const summaries: { id: number; summary: string }[] = JSON.parse(
+    const summaries: { id: number; articleIds?: number[]; summary: string }[] = JSON.parse(
       summaryResult.choices[0].message.content,
     );
 
-    return summaries.map(({ summary }) => summary).slice(0, 10);
+    const byIndex = (i: number) => news.find((n) => n.idx === i);
+    const results = summaries.slice(0, 10).map((s) => {
+      const links = (s.articleIds ?? [])
+        .map(byIndex)
+        .filter((n): n is { idx: number; title: string; link: string; source?: string } => !!n)
+        .map((n) => ({ title: n.title, url: n.link, source: n.source }));
+      return { summary: s.summary, links };
+    });
+
+    return results;
 
     // const scoredTopicResponse = await openai.chat.completions.create({
     //   messages: [

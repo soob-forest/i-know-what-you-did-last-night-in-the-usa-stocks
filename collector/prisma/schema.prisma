@@ -23,5 +23,16 @@ model News {
   stockId Int @map("stock_id")
   createdAt  DateTime   @default(now()) @map("created_at")
   modifiedAt  DateTime   @updatedAt @map("modified_at")
+  links NewsLink[]
 }
 
+model NewsLink {
+  id    Int     @id @default(autoincrement())
+  title String
+  url   String
+  source String?
+  news  News    @relation(fields: [newsId], references: [id])
+  newsId Int    @map("news_id")
+  createdAt  DateTime   @default(now()) @map("created_at")
+  modifiedAt  DateTime   @updatedAt @map("modified_at")
+}

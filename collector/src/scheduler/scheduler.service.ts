@@ -15,16 +15,29 @@ export class SchedulerService {
     const stocks = await this.prisma.stock.findMany();
 
     for (const stock of stocks) {
-      const summaries: string[] = await this.searchService.search(stock.name);
+      const items = await this.searchService.search(stock.name);
 
-      const news = await this.prisma.news.create({
-        data: {
-          date: new Date(),
-          summary: summaries.join('\n'),
-          stockId: stock.id,
-        },
-      });
-      console.log(news);
+      for (const item of items) {
+        const news = await this.prisma.news.create({
+          data: {
+            date: new Date(),
+            summary: item.summary,
+            stockId: stock.id,
+          },
+        });
+
+        if (item.links?.length) {
+          const links = item.links.slice(0, 5).map((l) => ({
+            title: l.title,
+            url: l.url,
+            source: l.source ?? null,
+            newsId: news.id,
+          }));
+          await this.prisma.newsLink.createMany({ data: links });
+        }
+
+        console.log(news);
+      }
     }
   }
 }
