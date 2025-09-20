@@ -15,12 +15,22 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(controllers = NewsController.class)
+@org.springframework.context.annotation.Import(api.config.CorsConfig.class)
 class NewsControllerTest {
 
   @Autowired MockMvc mockMvc;
   @MockBean NewsQueryService newsQueryService;
   // Prevent JPA metamodel initialization in MVC slice
   @MockBean org.springframework.data.jpa.mapping.JpaMetamodelMappingContext jpaMappingContext;
+
+  @Test
+  void getNews_allowsCorsFromLocalhost3000() throws Exception {
+    when(newsQueryService.getNewsFor(any(), any(), any())).thenReturn(List.of());
+
+    mockMvc.perform(get("/news").param("range", "overnight").header("Origin", "http://localhost:3000"))
+        .andExpect(status().isOk())
+        .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.header().string("Access-Control-Allow-Origin", "http://localhost:3000"));
+  }
 
   @Test
   void getNews_returnsOkPayload() throws Exception {
