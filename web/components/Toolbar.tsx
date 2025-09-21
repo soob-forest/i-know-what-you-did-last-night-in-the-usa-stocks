@@ -1,39 +1,22 @@
 export default function Toolbar({ range, q }: { range: 'overnight' | 'today'; q: string }) {
+  const chip = (active: boolean) =>
+    `px-3 py-1.5 rounded-full border ${active ? 'bg-neutral-900 text-white border-neutral-900' : 'text-neutral-900 border-gray-300'}`;
   return (
-    <div className="toolbar" style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
-      <nav style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-        <a href="/app?range=overnight" style={{
-          color: range === 'overnight' ? '#ffffff' : '#111111',
-          background: range === 'overnight' ? '#111111' : 'transparent',
-          border: `1px solid ${range === 'overnight' ? '#111111' : '#d1d5db'}`,
-          padding: '6px 10px', borderRadius: 999,
-          textDecoration: 'none'
-        }}>Overnight</a>
-        <a href="/app?range=today" style={{
-          color: range === 'today' ? '#ffffff' : '#111111',
-          background: range === 'today' ? '#111111' : 'transparent',
-          border: `1px solid ${range === 'today' ? '#111111' : '#d1d5db'}`,
-          padding: '6px 10px', borderRadius: 999,
-          textDecoration: 'none'
-        }}>Today</a>
+    <div className="sticky top-0 z-10 py-3 bg-white border-b border-gray-100 mb-3 flex items-center gap-3 flex-wrap">
+      <nav className="flex items-center gap-2">
+        <a href="/app?range=overnight" className={chip(range === 'overnight')}>Overnight</a>
+        <a href="/app?range=today" className={chip(range === 'today')}>Today</a>
       </nav>
-      <form method="get" action="/app" style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
+      <form method="get" action="/app" className="ml-auto flex gap-2">
         <input type="hidden" name="range" value={range} />
         <input
           name="q"
           placeholder="티커/회사명 검색"
           defaultValue={q}
-          style={{
-            background: '#ffffff', color: '#111111', border: '1px solid #d1d5db', borderRadius: 6,
-            padding: '8px 10px', minWidth: 200
-          }}
+          className="bg-white text-neutral-900 border border-gray-300 rounded-md px-3 py-2 min-w-[200px]"
         />
-        <button type="submit" style={{
-          background: '#111111', color: '#ffffff', border: '1px solid #111111', borderRadius: 6,
-          padding: '8px 12px'
-        }}>검색</button>
+        <button type="submit" className="bg-neutral-900 text-white border border-neutral-900 rounded-md px-3 py-2">검색</button>
       </form>
     </div>
   );
 }
-

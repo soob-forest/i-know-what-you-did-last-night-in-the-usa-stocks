@@ -3,15 +3,15 @@ import NewsGrid from '../../components/NewsGrid';
 
 export default function Loading() {
   const Card = () => (
-    <div className="card" style={{ background: '#f9fafb', borderRadius: 12, padding: 16, border: '1px solid #e5e7eb', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-        <div style={{ width: 180, height: 16, background: '#e5e7eb', borderRadius: 4 }} />
-        <div style={{ width: 80, height: 12, background: '#e5e7eb', borderRadius: 4 }} />
+    <div className="card bg-gray-50 rounded-xl p-4 border border-gray-200 shadow-sm animate-pulse">
+      <div className="flex justify-between mb-2">
+        <div className="w-44 h-4 bg-gray-200 rounded" />
+        <div className="w-20 h-3 bg-gray-200 rounded" />
       </div>
-      <div style={{ display: 'grid', gap: 6 }}>
-        <div style={{ width: '100%', height: 12, background: '#e5e7eb', borderRadius: 4 }} />
-        <div style={{ width: '90%', height: 12, background: '#e5e7eb', borderRadius: 4 }} />
-        <div style={{ width: '75%', height: 12, background: '#e5e7eb', borderRadius: 4 }} />
+      <div className="grid gap-1.5">
+        <div className="w-full h-3 bg-gray-200 rounded" />
+        <div className="w-[90%] h-3 bg-gray-200 rounded" />
+        <div className="w-[75%] h-3 bg-gray-200 rounded" />
       </div>
     </div>
   );
@@ -19,11 +19,11 @@ export default function Loading() {
   return (
     <main>
       <Container>
-        <div className="toolbar" style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
-          <div style={{ width: 240, height: 32, background: '#f3f4f6', border: '1px solid #e5e7eb', borderRadius: 999 }} />
-          <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
-            <div style={{ width: 220, height: 36, background: '#f3f4f6', border: '1px solid #e5e7eb', borderRadius: 6 }} />
-            <div style={{ width: 80, height: 36, background: '#111111', opacity: .1, borderRadius: 6 }} />
+        <div className="sticky top-0 z-10 py-3 bg-white border-b border-gray-100 mb-3 flex items-center gap-3 flex-wrap">
+          <div className="w-60 h-8 bg-gray-100 border border-gray-200 rounded-full" />
+          <div className="ml-auto flex gap-2">
+            <div className="w-56 h-9 bg-gray-100 border border-gray-200 rounded-md" />
+            <div className="w-20 h-9 bg-neutral-900/10 rounded-md" />
           </div>
         </div>
         <NewsGrid>
