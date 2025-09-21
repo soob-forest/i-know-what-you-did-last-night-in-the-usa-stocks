@@ -6,11 +6,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import api.news.Link;
-import api.news.NewsQueryService;
-import api.news.NewsResponse;
-import api.subscriptions.domain.Stock.StockDto;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -23,15 +20,30 @@ import org.springframework.test.web.servlet.MockMvc;
 class AppUiControllerTest {
 
   @Autowired MockMvc mockMvc;
-  @MockBean NewsQueryService newsQueryService;
+  @MockBean AppUiService appUiService;
   @MockBean org.springframework.data.jpa.mapping.JpaMetamodelMappingContext jpaMappingContext;
 
   @Test
   void returnsUiBlocksSchema() throws Exception {
-    var stock = new StockDto(1L, "Apple Inc.", "AAPL");
-    var link = new Link("Launch article", "https://example.com/a", "example.com");
-    var news = new NewsResponse(stock, "Apple released new products overnight.", "2025-06-01", List.of(link));
-    when(newsQueryService.getNewsFor(any(), any(), any())).thenReturn(List.of(news));
+    var schema = Map.of(
+        "version", "v1",
+        "blocks", List.of(
+            new UIBlock("Toolbar", Map.of("range", "overnight", "q", "AAPL"), List.of()),
+            new UIBlock("Container", Map.of(), List.of(
+                new UIBlock("NewsGrid", Map.of(), List.of(
+                    new UIBlock("NewsCard", Map.of(
+                        "news", Map.of(
+                            "stock", Map.of("name", "Apple Inc.", "ticker", "AAPL"),
+                            "summary", "...",
+                            "date", "2025-06-01",
+                            "links", List.of()
+                        )
+                    ), List.of())
+                ))
+            ))
+        )
+    );
+    when(appUiService.buildSchema(any(), any(), any(), any())).thenReturn(schema);
 
     mockMvc.perform(get("/ui/app").param("range", "overnight").param("q", "AAPL"))
         .andExpect(status().isOk())
@@ -42,4 +54,3 @@ class AppUiControllerTest {
         .andExpect(jsonPath("$.blocks[1].children[0].children[0].props.news.stock.ticker").value("AAPL"));
   }
 }
-

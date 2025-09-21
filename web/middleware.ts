@@ -49,6 +49,9 @@ export function middleware(req: NextRequest) {
   if (pathname === '/__test__/ui/app') {
     const range = searchParams.get('range') || 'overnight';
     const q = (searchParams.get('q') || '').toLowerCase();
+    if (range === 'invalid') {
+      return NextResponse.json({ blocks: [{ type: 'UnknownBlock', props: {} }] });
+    }
     // Reuse the same stub news
     const makeNews = () => {
       const overnight = [
@@ -94,6 +97,9 @@ export function middleware(req: NextRequest) {
         ],
       },
     ];
+    if (list.length === 0) {
+      blocks[1] = { type: 'Container', children: [{ type: 'EmptyState', props: { message: '표시할 뉴스가 없습니다.' } }] } as any;
+    }
     return NextResponse.json({ blocks });
   }
   return NextResponse.next();
