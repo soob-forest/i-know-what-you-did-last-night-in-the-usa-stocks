@@ -6,6 +6,7 @@ import EmptyState from '../../components/EmptyState';
 import type { UIBlock } from '../../lib/sdui/types';
 import type { News } from '../../lib/types';
 import UnsupportedBlock from '../../components/UnsupportedBlock';
+import { JSX } from 'react';
 
 type RegistryEntry = (props?: Record<string, any>, children?: UIBlock[]) => JSX.Element | null;
 
