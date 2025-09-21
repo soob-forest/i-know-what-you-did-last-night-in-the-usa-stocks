@@ -29,7 +29,13 @@ function SourceBadge({ source }: { source?: string }) {
 function NewsCard({ n }: { n: News }) {
   const bullets = n.summary.split('\n').filter(Boolean).slice(0, 5);
   return (
-    <article style={{ background: '#ffffff', borderRadius: 12, padding: 16, border: '1px solid #e5e7eb' }}>
+    <article style={{
+      background: '#f9fafb',
+      borderRadius: 12,
+      padding: 16,
+      border: '1px solid #e5e7eb',
+      boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+    }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8 }}>
         <h3 style={{ margin: 0, fontSize: 16, color: '#111111' }}>
           {n.stock.name} ({n.stock.ticker})
