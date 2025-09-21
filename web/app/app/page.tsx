@@ -61,8 +61,10 @@ function NewsCard({ n }: { n: News }) {
           <ul style={{ margin: 0, paddingLeft: 16 }}>
             {n.links.slice(0, 3).map((l, i) => (
               <li key={i}>
-                <a href={l.url} target="_blank" rel="noreferrer" style={{ color: '#1d4ed8' }}>
-                  {l.title}
+                <a href={l.url} target="_blank" rel="noreferrer" style={{ color: '#1d4ed8', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                  <img src={`https://www.google.com/s2/favicons?sz=16&domain=${encodeURIComponent(l.source || (new URL(l.url)).hostname)}`}
+                       alt="" width={16} height={16} style={{ borderRadius: 3 }} />
+                  <span>{l.title}</span>
                 </a>
               </li>
             ))}
@@ -73,8 +75,10 @@ function NewsCard({ n }: { n: News }) {
               <ul style={{ margin: '6px 0 0', paddingLeft: 16 }}>
                 {n.links.slice(3).map((l, i) => (
                   <li key={`more-${i}`}>
-                    <a href={l.url} target="_blank" rel="noreferrer" style={{ color: '#1d4ed8' }}>
-                      {l.source ? `[${l.source}] ` : ''}{l.title}
+                    <a href={l.url} target="_blank" rel="noreferrer" style={{ color: '#1d4ed8', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                      <img src={`https://www.google.com/s2/favicons?sz=16&domain=${encodeURIComponent(l.source || (new URL(l.url)).hostname)}`}
+                           alt="" width={16} height={16} style={{ borderRadius: 3 }} />
+                      <span>{l.source ? `[${l.source}] ` : ''}{l.title}</span>
                     </a>
                   </li>
                 ))}
@@ -100,7 +104,7 @@ export default async function Page({ searchParams }: { searchParams: { range?: '
   return (
     <main>
       <div className="container">
-      <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 12, flexWrap: 'wrap' }}>
+      <div className="toolbar" style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
         <nav style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           <a href="/app?range=overnight" style={{
             color: range === 'overnight' ? '#ffffff' : '#111111',
