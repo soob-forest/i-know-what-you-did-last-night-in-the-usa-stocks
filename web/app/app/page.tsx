@@ -29,7 +29,7 @@ function SourceBadge({ source }: { source?: string }) {
 function NewsCard({ n }: { n: News }) {
   const bullets = n.summary.split('\n').filter(Boolean).slice(0, 5);
   return (
-    <article style={{
+    <article className="card" style={{
       background: '#f9fafb',
       borderRadius: 12,
       padding: 16,
@@ -99,6 +99,7 @@ export default async function Page({ searchParams }: { searchParams: { range?: '
 
   return (
     <main>
+      <div className="container">
       <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 12, flexWrap: 'wrap' }}>
         <nav style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           <a href="/app?range=overnight" style={{
@@ -138,11 +139,12 @@ export default async function Page({ searchParams }: { searchParams: { range?: '
         <div style={{ opacity: 0.8 }}>표시할 뉴스가 없습니다. 구독 종목 또는 수집 데이터를 확인하세요.</div>
       )}
 
-      <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: 16 }}>
+      <section className="news-grid">
         {items.map((n, idx) => (
           <NewsCard key={`${n.stock.ticker}-${idx}`} n={n} />
         ))}
       </section>
+      </div>
     </main>
   );
 }
