@@ -1,0 +1,11 @@
+### SDUI App UI schema examples
+@host = http://localhost:8080
+
+### Server-driven UI for app (overnight)
+GET {{host}}/ui/app?range=overnight
+Accept: application/json
+
+### With query filter
+GET {{host}}/ui/app?range=today&q=AAPL
+Accept: application/json
+

@@ -31,3 +31,23 @@
 - [ ] 뉴스 조회 API + 인덱스/캐시
 - [ ] SSE 알림 채널
 - [ ] Next.js 페이지/상태(SWR) + 보호 라우팅
+
+## SDUI(Server-Driven UI) 설계
+- 블록 타입(UIBlock): `{ type: string, props?: object, children?: UIBlock[] }`
+- 컴포넌트 레지스트리(클라이언트): 허용된 컴포넌트만 렌더 → 보안/일관성 확보
+- 렌더러: 깊이 우선으로 children을 재귀 렌더
+- 예시 스키마(JSON)
+```
+{
+  "blocks": [
+    { "type": "Toolbar", "props": { "range": "overnight", "q": "" } },
+    { "type": "Container", "children": [
+      { "type": "NewsGrid", "children": [
+        { "type": "NewsCard", "props": { "news": { "stock": {"name":"Apple Inc.","ticker":"AAPL"}, "summary":"...", "date":"2025-06-01", "links": [] } } }
+      ] }
+    ] }
+  ]
+}
+```
+- 엔드포인트: `GET /ui/app?range=overnight|today&q=...` (Spring), 응답은 위 스키마
+- 페이지 동작: `/app?sdui=1` 사용 시 SDUI 스키마 fetch → Renderer 렌더, 기본은 로컬 스키마 조립
