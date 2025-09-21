@@ -1,0 +1,24 @@
+### Subscription API examples
+@host = http://localhost:8080
+@user = U_TEST
+
+### Register subscription settings for a user (push time)
+POST {{host}}/subscriptions/register?email={{user}}
+Content-Type: application/json
+
+{
+  "pushAt": "09:00:00"
+}
+
+### Subscribe a stock ticker for the user
+POST {{host}}/subscriptions?email={{user}}
+Content-Type: application/json
+
+{
+  "ticker": "AAPL"
+}
+
+### Get current subscribing stocks for the user
+GET {{host}}/subscriptions/subscribingStocks?email={{user}}
+Accept: application/json
+

@@ -73,3 +73,5 @@ out/
 ### VS Code ###
 .vscode/
 .env
+/web/.next/
+/web/package-lock.json

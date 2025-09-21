@@ -1,0 +1,15 @@
+### News API examples
+@host = http://localhost:8080
+
+### Overnight news for test user subscriptions (uses TEST_USER_ID on server)
+GET {{host}}/news?range=overnight
+Accept: application/json
+
+### Today news for specific tickers
+GET {{host}}/news?range=today&tickers=AAPL,TSLA
+Accept: application/json
+
+### Empty result example (no matching data)
+GET {{host}}/news?range=today&tickers=UNKNOWN
+Accept: application/json
+

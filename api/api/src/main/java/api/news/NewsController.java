@@ -22,7 +22,7 @@ public class NewsController {
       @RequestParam(name = "range", defaultValue = "overnight") String range,
       @RequestParam(name = "tickers", required = false) String tickers
   ) {
-    String testUserId = Optional.ofNullable(System.getenv("TEST_USER_ID")).orElse("U_TEST");
+    String testUserId = Optional.ofNullable(System.getenv("TEST_USER_ID")).orElse("test_user_001");
     Optional<List<String>> tickersOpt = Optional.ofNullable(tickers)
         .filter(s -> !s.isBlank())
         .map(s -> Arrays.stream(s.split(",")).map(String::trim).filter(t -> !t.isEmpty()).toList());
