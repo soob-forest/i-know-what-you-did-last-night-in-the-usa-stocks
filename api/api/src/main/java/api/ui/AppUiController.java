@@ -24,7 +24,7 @@ public class AppUiController {
       @RequestParam(name = "tickers", required = false) String tickers,
       @RequestParam(name = "q", required = false) String q
   ) {
-    String testUserId = Optional.ofNullable(System.getenv("TEST_USER_ID")).orElse("U_TEST");
+    String testUserId = Optional.ofNullable(System.getenv("TEST_USER_ID")).orElse("test_user_001");
     Optional<List<String>> tickersOpt = Optional.ofNullable(tickers)
         .filter(s -> !s.isBlank())
         .map(s -> List.of(s.split(",")));
