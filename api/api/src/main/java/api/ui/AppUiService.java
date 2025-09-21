@@ -16,7 +16,22 @@ public class AppUiService {
 
   private final NewsQueryService newsQueryService;
 
+  @org.springframework.beans.factory.annotation.Value("${ui.cache.ttlMillis:30000}")
+  long ttlMillis = 30000;
+  @org.springframework.beans.factory.annotation.Value("${ui.url.allowedSchemes:http,https}")
+  String allowedSchemesProp = "http,https";
+  @org.springframework.beans.factory.annotation.Value("${ui.maxLinks:5}")
+  int maxLinks = 5;
+
+  private final java.util.concurrent.ConcurrentHashMap<String, CacheEntry> cache = new java.util.concurrent.ConcurrentHashMap<>();
+
   public Map<String, Object> buildSchema(String range, String q, String userId, Optional<List<String>> tickersOpt) {
+    String cacheKey = keyOf(range, q, userId, tickersOpt);
+    long now = System.currentTimeMillis();
+    var hit = cache.get(cacheKey);
+    if (hit != null && hit.expiresAt >= now) {
+      return hit.body;
+    }
     var list = newsQueryService.getNewsFor(range, tickersOpt, userId);
     if (q != null && !q.isBlank()) {
       final String qq = q.toLowerCase();
@@ -42,6 +57,7 @@ public class AppUiService {
     Map<String, Object> body = new HashMap<>();
     body.put("version", "v1");
     body.put("blocks", blocks);
+    cache.put(cacheKey, new CacheEntry(body, now + ttlMillis));
     return body;
   }
 
@@ -65,15 +81,24 @@ public class AppUiService {
     if (n == null || n.stock() == null || n.stock().name() == null || n.stock().ticker() == null || n.summary() == null || n.date() == null) {
       return Optional.empty();
     }
-    // Sanitize links (basic URL presence)
-    var safeLinks = n.links() == null ? List.<Map<String, Object>>of() : n.links().stream().map(l -> {
+    // Sanitize links (scheme allowlist + required fields)
+    var schemes = java.util.Arrays.stream(allowedSchemesProp.split(",")).map(String::trim).filter(s -> !s.isBlank()).collect(java.util.stream.Collectors.toSet());
+    var safeLinksStream = n.links() == null ? java.util.stream.Stream.<Map<String, Object>>empty() : n.links().stream().map(l -> {
       if (l == null || l.title() == null || l.url() == null) return null;
+      try {
+        var uri = new java.net.URI(l.url());
+        var scheme = uri.getScheme();
+        if (scheme == null || !schemes.contains(scheme.toLowerCase())) return null;
+      } catch (Exception e) {
+        return null;
+      }
       Map<String, Object> m = new HashMap<>();
       m.put("title", l.title());
       m.put("url", l.url());
       if (l.source() != null) m.put("source", l.source());
       return m;
-    }).filter(m -> m != null).toList();
+    }).filter(m -> m != null);
+    var safeLinks = safeLinksStream.limit(Math.max(0, maxLinks)).toList();
 
     Map<String, Object> stock = Map.of("name", n.stock().name(), "ticker", n.stock().ticker());
     Map<String, Object> newsObj = new HashMap<>();
@@ -84,5 +109,11 @@ public class AppUiService {
     Map<String, Object> props = Map.of("news", newsObj);
     return Optional.of(new UIBlock("NewsCard", props, List.of()));
   }
-}
 
+  private record CacheEntry(Map<String, Object> body, long expiresAt) {}
+
+  private String keyOf(String range, String q, String userId, Optional<List<String>> tickersOpt) {
+    var tickers = tickersOpt.map(list -> String.join("|", list)).orElse("");
+    return String.join("#", range == null ? "" : range, q == null ? "" : q, userId == null ? "" : userId, tickers);
+  }
+}

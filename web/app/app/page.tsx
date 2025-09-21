@@ -14,12 +14,11 @@ async function getData(range: 'today' | 'overnight' = 'overnight'): Promise<News
   return res.json();
 }
 
-async function getSchema(range: 'today' | 'overnight', q: string): Promise<UIBlock[]> {
+async function getSchema(range: 'today' | 'overnight', q: string): Promise<UISchemaResponse> {
   const qs = new URLSearchParams({ range, q }).toString();
   const res = await fetch(`${API_BASE}/ui/app?${qs}`, { next: { revalidate: 15 } });
-  if (!res.ok) return [];
-  const json = (await res.json()) as UISchemaResponse;
-  return json.blocks || [];
+  if (!res.ok) return { version: 'v1', blocks: [] };
+  return (await res.json()) as UISchemaResponse;
 }
 
 // components moved to /components: Container, Toolbar, NewsGrid, NewsCard
@@ -32,7 +31,15 @@ export default async function Page({ searchParams }: { searchParams: { range?: '
   const items = useSchema ? [] : (() => { /* placeholder for type */ return [] as News[] })();
   let blocks: UIBlock[] = [];
   if (useSchema) {
-    blocks = await getSchema(range, qRaw);
+    const schema = await getSchema(range, qRaw);
+    if (schema.version && schema.version !== 'v1') {
+      blocks = [
+        { type: 'Toolbar', props: { range, q: qRaw } },
+        { type: 'Container', children: [{ type: 'EmptyState', props: { message: `지원되지 않는 스키마 버전(${schema.version})` } }] },
+      ];
+    } else {
+      blocks = schema.blocks || [];
+    }
   } else {
     const list = await getData(range);
     blocks = [

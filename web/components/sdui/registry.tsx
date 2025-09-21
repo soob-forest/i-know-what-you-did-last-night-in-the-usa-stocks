@@ -5,6 +5,7 @@ import NewsCard from '../../components/NewsCard';
 import EmptyState from '../../components/EmptyState';
 import type { UIBlock } from '../../lib/sdui/types';
 import type { News } from '../../lib/types';
+import UnsupportedBlock from '../../components/UnsupportedBlock';
 
 type RegistryEntry = (props?: Record<string, any>, children?: UIBlock[]) => JSX.Element | null;
 
@@ -33,7 +34,7 @@ export function Renderer({ blocks }: { blocks: UIBlock[] }) {
     <>
       {blocks.map((b, idx) => {
         const render = componentRegistry[b.type];
-        if (!render) return null;
+        if (!render) return <UnsupportedBlock key={`${b.type}-${idx}`} />;
         return <div key={`${b.type}-${idx}`}>{render(b.props, b.children)}</div>;
       })}
     </>

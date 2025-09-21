@@ -3,6 +3,8 @@ package api.ui;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import api.news.Link;
 import api.news.NewsQueryService;
@@ -53,5 +55,40 @@ class AppUiServiceTest {
     var child = container.children().get(0);
     assertThat(child.type()).isEqualTo("EmptyState");
   }
-}
 
+  @Test
+  void filtersLinksBySchemeAndLimitsCountAndCaches() {
+    var stock = new StockDto(1L, "Apple Inc.", "AAPL");
+    var links = List.of(
+        new Link("ok1", "https://ok/1", "ok"),
+        new Link("bad", "javascript:alert(1)", null),
+        new Link("ok2", "http://ok/2", null),
+        new Link("ok3", "https://ok/3", null),
+        new Link("ok4", "https://ok/4", null),
+        new Link("ok5", "https://ok/5", null),
+        new Link("ok6", "https://ok/6", null)
+    );
+    var news = new NewsResponse(stock, "S", "2025-06-01", links);
+    when(newsQueryService.getNewsFor(any(), any(), any())).thenReturn(List.of(news));
+
+    // adjust config
+    service.ttlMillis = 30000;
+    service.allowedSchemesProp = "http,https";
+    service.maxLinks = 5;
+
+    var out1 = service.buildSchema("overnight", "", "U_TEST", Optional.empty());
+    var out2 = service.buildSchema("overnight", "", "U_TEST", Optional.empty());
+
+    verify(newsQueryService, times(1)).getNewsFor(any(), any(), any());
+
+    @SuppressWarnings("unchecked")
+    var blocks = (List<UIBlock>) out1.get("blocks");
+    var container = blocks.get(1);
+    var grid = container.children().get(0);
+    var card = grid.children().get(0);
+    @SuppressWarnings("unchecked") var props = (java.util.Map<String, Object>) card.props();
+    @SuppressWarnings("unchecked") var newsObj = (java.util.Map<String, Object>) props.get("news");
+    @SuppressWarnings("unchecked") var keptLinks = (java.util.List<java.util.Map<String, Object>>) newsObj.get("links");
+    assertThat(keptLinks.size()).isEqualTo(5);
+  }
+}
