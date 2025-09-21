@@ -2,6 +2,8 @@ import Container from '../../components/Container';
 import Toolbar from '../../components/Toolbar';
 import NewsGrid from '../../components/NewsGrid';
 import NewsCard from '../../components/NewsCard';
+import { Renderer } from '../../components/sdui/registry';
+import type { UIBlock, UISchemaResponse } from '../../lib/sdui/types';
 import type { News } from '../../lib/types';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080';
@@ -12,31 +14,46 @@ async function getData(range: 'today' | 'overnight' = 'overnight'): Promise<News
   return res.json();
 }
 
+async function getSchema(range: 'today' | 'overnight', q: string): Promise<UIBlock[]> {
+  const qs = new URLSearchParams({ range, q }).toString();
+  const res = await fetch(`${API_BASE}/ui/app?${qs}`, { next: { revalidate: 15 } });
+  if (!res.ok) return [];
+  const json = (await res.json()) as UISchemaResponse;
+  return json.blocks || [];
+}
+
 // components moved to /components: Container, Toolbar, NewsGrid, NewsCard
 
-export default async function Page({ searchParams }: { searchParams: { range?: 'today' | 'overnight', q?: string } }) {
+export default async function Page({ searchParams }: { searchParams: { range?: 'today' | 'overnight', q?: string, sdui?: string } }) {
   const range = (searchParams?.range as 'today' | 'overnight') || 'overnight';
-  const q = (searchParams?.q || '').trim().toLowerCase();
-  const list = await getData(range);
-  const items = q
-    ? list.filter(n => `${n.stock.name} ${n.stock.ticker}`.toLowerCase().includes(q))
-    : list;
+  const qRaw = (searchParams?.q || '').trim();
+  const q = qRaw.toLowerCase();
+  const useSchema = searchParams?.sdui === '1';
+  const items = useSchema ? [] : (() => { /* placeholder for type */ return [] as News[] })();
+  let blocks: UIBlock[] = [];
+  if (useSchema) {
+    blocks = await getSchema(range, qRaw);
+  } else {
+    const list = await getData(range);
+    blocks = [
+      { type: 'Toolbar', props: { range, q: qRaw } },
+      {
+        type: 'Container',
+        children: [
+          {
+            type: 'NewsGrid',
+            children: list
+              .filter(n => (q ? `${n.stock.name} ${n.stock.ticker}`.toLowerCase().includes(q) : true))
+              .map((n) => ({ type: 'NewsCard', props: { news: n } })),
+          },
+        ],
+      },
+    ];
+  }
 
   return (
     <main>
-      <Container>
-      <Toolbar range={range} q={q} />
-
-      {items.length === 0 && (
-        <div style={{ opacity: 0.8 }}>표시할 뉴스가 없습니다. 구독 종목 또는 수집 데이터를 확인하세요.</div>
-      )}
-
-      <NewsGrid>
-        {items.map((n, idx) => (
-          <NewsCard key={`${n.stock.ticker}-${idx}`} n={n} />
-        ))}
-      </NewsGrid>
-      </Container>
+      <Renderer blocks={blocks} />
     </main>
   );
 }
