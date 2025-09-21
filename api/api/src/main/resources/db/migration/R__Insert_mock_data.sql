@@ -1,5 +1,23 @@
--- V2__Insert_mock_data.sql
+-- R__Insert_mock_data.sql
 -- 테스트 및 개발용 Mock 데이터 삽입
+
+-- 기존 데이터 삭제 (반복 실행을 위해)
+-- 외래키 제약조건을 고려한 순서로 삭제
+DELETE FROM news_link;
+DELETE FROM news;
+DELETE FROM subscription_stock;
+UPDATE member SET subscription_id = NULL;
+DELETE FROM subscription;
+DELETE FROM member;
+DELETE FROM stock;
+
+-- Auto-increment ID 리셋
+ALTER SEQUENCE member_id_seq RESTART WITH 1;
+ALTER SEQUENCE subscription_id_seq RESTART WITH 1;
+ALTER SEQUENCE stock_id_seq RESTART WITH 1;
+ALTER SEQUENCE subscription_stock_id_seq RESTART WITH 1;
+ALTER SEQUENCE news_id_seq RESTART WITH 1;
+ALTER SEQUENCE news_link_id_seq RESTART WITH 1;
 
 -- 1. Stock 데이터 (주요 미국 주식들)
 INSERT INTO stock (name, ticker, created_at, modified_at) VALUES
@@ -27,13 +45,13 @@ INSERT INTO member (user_id, created_at, modified_at) VALUES
 ('slack_user_john', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
 ('slack_user_jane', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
--- 3. Subscription 데이터 (각 사용자별 구독 설정)
-INSERT INTO subscription (push_at, member_id, created_at, modified_at) VALUES
-('09:00:00', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-('10:30:00', 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-('15:00:00', 3, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-('08:30:00', 4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-('16:00:00', 5, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+-- 3. Subscription 데이터 (각 사용자별 구독 설정) - member_id 없이 먼저 생성
+INSERT INTO subscription (push_at, created_at, modified_at) VALUES
+('09:00:00', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('10:30:00', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('15:00:00', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('08:30:00', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('16:00:00', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 -- Member와 Subscription 연결 업데이트
 UPDATE member SET subscription_id = 1 WHERE id = 1;

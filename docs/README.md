@@ -28,5 +28,5 @@
 - 관리자 `/admin/jobs`에서 최근 24h 작업 목록/상태/오류 메시지 확인 가능.
 - API: `GET /api/news?date=YYYY-MM-DD&tickers=AAPL` 응답 500ms 내(캐시 허용).
 
-더 자세한 엔드포인트와 페이로드는 `api-spec.md`, 아키텍처/데이터 모델은 `web-architecture.md`를 참고하세요.
+더 자세한 엔드포인트와 페이로드는 `docs/spec/api-spec.md`, 아키텍처/데이터 모델은 `docs/arch/web-architecture.md`를 참고하세요.
 
