@@ -11,7 +11,7 @@ export default function NewsCard({ n }: { n: News }) {
     return `https://www.google.com/s2/favicons?sz=16&domain=${encodeURIComponent(host || '')}`;
   };
   return (
-    <article className="card bg-gray-50 rounded-xl p-4 border border-gray-200 shadow-sm transition will-change-transform will-change-shadow">
+    <article className="card bg-gray-50 rounded-xl p-4 border border-gray-200 shadow-sm transition duration-150 ease-out transform-gpu hover:shadow-xl hover:scale-[1.02] hover:-translate-y-0.5">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8 }}>
         <h3 className="m-0 text-base text-neutral-900">{n.stock.name} ({n.stock.ticker})</h3>
         <time className="text-xs text-gray-500">{n.date}</time>
