@@ -4,5 +4,8 @@ export type UIBlock = {
   children?: UIBlock[];
 };
 
-export type UISchemaResponse = { blocks: UIBlock[] };
+export type UISchemaResponse = { 
+  blocks: UIBlock[]; 
+  version?:string; 
+};
 

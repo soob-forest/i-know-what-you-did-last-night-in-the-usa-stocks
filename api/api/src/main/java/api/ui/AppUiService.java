@@ -116,4 +116,17 @@ public class AppUiService {
     var tickers = tickersOpt.map(list -> String.join("|", list)).orElse("");
     return String.join("#", range == null ? "" : range, q == null ? "" : q, userId == null ? "" : userId, tickers);
   }
+
+  public void invalidateForUser(String userId) {
+    if (userId == null) return;
+    var it = cache.keySet().iterator();
+    while (it.hasNext()) {
+      var key = it.next();
+      // key = range#q#userId#tickers
+      var parts = key.split("#", -1);
+      if (parts.length >= 3 && userId.equals(parts[2])) {
+        it.remove();
+      }
+    }
+  }
 }
